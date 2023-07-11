@@ -1,7 +1,6 @@
 FROM halohub/halo:2.6 as halo
+RUN halo --halo.security.initializer.superadminusername=zhangsan --halo.security.initializer.superadminpassword=P@88w0rd
 
-ENV halo.security.initializer.superadminusername admin
-ENV halo.security.initializer.superadminpassword P@88w0rd
 
 # WORKDIR application
 # ARG JAR_FILE=application/build/libs/*.jar
