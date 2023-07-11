@@ -1,5 +1,11 @@
-FROM halohub/halo:2.6 as halo
-RUN halo --halo.security.initializer.superadminusername=zhangsan --halo.security.initializer.superadminpassword=P@88w0rd
+FROM halohub/halo:2.6
+
+CMD ["--spring.sql.init.platform=mysql",
+     "--spring.r2dbc.url=r2dbc:pool:mysql://hk-cdb-hbgfyvc9.sql.tencentcdb.com:63985/halo",
+     "--spring.r2dbc.username=root",
+     "--spring.r2dbc.password=Qw385613",
+     "--halo.security.initializer.superadminusername=admin",
+     "--halo.security.initializer.superadminpassword=P@88w0rd"]
 
 
 # WORKDIR application
