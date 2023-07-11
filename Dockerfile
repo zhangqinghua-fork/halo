@@ -1,7 +1,7 @@
 FROM halohub/halo:2.6
 
 CMD ["--spring.sql.init.platform=mysql",
-     "--spring.r2dbc.url=r2dbc:pool:mysql://hk-cdb-hbgfyvc9.sql.tencentcdb.com:63985/halo",
+     "--spring.r2dbc.url='r2dbc:pool:mysql://hk-cdb-hbgfyvc9.sql.tencentcdb.com:63985/halo'",
      "--spring.r2dbc.username=root",
      "--spring.r2dbc.password=Qw385613",
      "--halo.security.initializer.superadminusername=admin",
