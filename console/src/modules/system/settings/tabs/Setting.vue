@@ -1,41 +1,38 @@
 <script lang="ts" setup>
 // core libs
-import { inject, ref, type Ref, computed } from "vue";
-
-// hooks
-import { useSettingFormConvert } from "@/composables/use-setting-form";
-import { apiClient } from "@/utils/api-client";
+import { computed, ref, type Ref, inject, toRaw } from "vue";
 
 // components
 import { Toast, VButton } from "@halo-dev/components";
 
-// types
-import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
-import { useRouteParams } from "@vueuse/router";
-import { useI18n } from "vue-i18n";
+// hooks
+import { useSettingFormConvert } from "@/composables/use-setting-form";
+import { useRouteQuery } from "@vueuse/router";
+import { useSystemConfigMapStore } from "@/stores/system-configmap";
+import type { ConfigMap, Setting } from "@halo-dev/api-client";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
-import { toRaw } from "vue";
+import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
+
+const SYSTEM_CONFIGMAP_NAME = "system";
 
 const { t } = useI18n();
+const systemConfigMapStore = useSystemConfigMapStore();
 const queryClient = useQueryClient();
 
-const group = useRouteParams<string>("group");
-
-const plugin = inject<Ref<Plugin | undefined>>("plugin");
+const group = useRouteQuery<string>("tab", undefined, { mode: "push" });
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
 
-const { data: configMap, suspense } = useQuery<ConfigMap>({
-  queryKey: ["plugin-configMap", plugin],
+const { data: configMap } = useQuery<ConfigMap>({
+  queryKey: ["system-configMap"],
   queryFn: async () => {
-    const { data } = await apiClient.plugin.fetchPluginConfig({
-      name: plugin?.value?.metadata.name as string,
+    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
+      name: SYSTEM_CONFIGMAP_NAME,
     });
     return data;
   },
-  enabled: computed(() => {
-    return !!setting.value && !!plugin?.value;
-  }),
+  enabled: computed(() => !!setting.value),
 });
 
 const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
@@ -46,25 +43,27 @@ const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
 
 const handleSaveConfigMap = async () => {
   saving.value = true;
+
   const configMapToUpdate = convertToSave();
-  if (!configMapToUpdate || !plugin?.value) {
+
+  if (!configMapToUpdate) {
     saving.value = false;
     return;
   }
 
-  await apiClient.plugin.updatePluginConfig({
-    name: plugin.value.metadata.name,
+  const { data } = await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+    name: SYSTEM_CONFIGMAP_NAME,
     configMap: configMapToUpdate,
   });
 
   Toast.success(t("core.common.toast.save_success"));
 
-  queryClient.invalidateQueries({ queryKey: ["plugin-configMap"] });
+  queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
+
+  systemConfigMapStore.configMap = data;
 
   saving.value = false;
 };
-
-await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
@@ -86,7 +85,7 @@ await suspense();
           />
         </FormKit>
       </div>
-      <div v-permission="['system:plugins:manage']" class="pt-5">
+      <div v-permission="['system:configmaps:manage']" class="pt-5">
         <div class="flex justify-start">
           <VButton
             :loading="saving"
