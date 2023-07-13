@@ -2,7 +2,7 @@
 FROM halohub/halo:2.7
 
 # Set environment variables
-ENV HALO_EXTERNAL_URL=https://blog.talkai.club
+ENV HALO_EXTERNAL_URL=https://halo-production-c68f.up.railway.app
 ENV SPRING_SQL_INIT_PLATFORM=mysql
 ENV SPRING_R2DBC_URL=r2dbc:pool:mysql://hk-cdb-hbgfyvc9.sql.tencentcdb.com:63985/halo
 ENV SPRING_R2DBC_USERNAME=root
