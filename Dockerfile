@@ -1,5 +1,5 @@
 # Use halohub/halo:2.6 as the base image
-FROM halohub/halo:2.6
+FROM halohub/halo:2.7
 
 # Set environment variables
 ENV HALO_EXTERNAL_URL=https://blog.talkai.club
