@@ -14,7 +14,7 @@ ENV HALO_SECURITY_INITIALIZER_SUPERADMINPASSWORD=P@88w0rd
 CMD ["--cpus", "0.5"]
 
 # 限制内存使用为512MB
-CMD ["--memory", "512m"]
+CMD ["--memory", "256m"]
 
 # Run echo command
 RUN echo "Hello docker!"
